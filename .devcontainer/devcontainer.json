@@ -93,8 +93,7 @@
         "anthropic.claude-code",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "ms-python.debugpy",
-        "denoland.vscode-deno"
+        "ms-python.debugpy"
       ],
       "settings": {
         "workbench.startupEditor": "readme",
