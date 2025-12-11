@@ -31,6 +31,7 @@
     <!-- Search -->
     <div class="search-bar">
         <sl-input
+            id="search-input"
             placeholder="Search todos..."
             clearable
             hx-get="/api/todos/search"
@@ -42,6 +43,9 @@
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
     </div>
+
+    <!-- Priority filters -->
+    {% include "partials/priority_filters.html" %}
 
     <!-- Quick add todo -->
     <form class="quick-add-form"

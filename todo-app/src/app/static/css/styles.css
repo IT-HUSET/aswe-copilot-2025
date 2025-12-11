@@ -346,6 +346,10 @@ body {
     padding-left: 8px;
 }
 
+.priority-filters {
+    margin-bottom: 16px;
+}
+
 .auth-form sl-input::part(prefix) {
     padding-left: 12px;
 }

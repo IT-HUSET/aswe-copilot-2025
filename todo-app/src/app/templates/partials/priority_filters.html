@@ -1,0 +1,37 @@
+{% set filter_list = list if list is defined else current_list %}
+<div class="priority-filters" id="priority-filters" hx-swap-oob="true">
+    <sl-button-group label="Filter by priority">
+        <sl-button
+            hx-get="/api/todos/search"
+            hx-target="#todos-list"
+            hx-vals='js:{"list_id": "{{ filter_list.id }}", "q": document.querySelector("#search-input").value || "", "priority": "all"}'
+            variant="{{ 'primary' if (priority_filter is defined and priority_filter == 'all') or not priority_filter is defined else 'default' }}"
+            aria-label="Filter by all priorities">
+            All
+        </sl-button>
+        <sl-button
+            hx-get="/api/todos/search"
+            hx-target="#todos-list"
+            hx-vals='js:{"list_id": "{{ filter_list.id }}", "q": document.querySelector("#search-input").value || "", "priority": "high"}'
+            variant="{{ 'primary' if priority_filter is defined and priority_filter == 'high' else 'default' }}"
+            aria-label="Filter by high priority">
+            High
+        </sl-button>
+        <sl-button
+            hx-get="/api/todos/search"
+            hx-target="#todos-list"
+            hx-vals='js:{"list_id": "{{ filter_list.id }}", "q": document.querySelector("#search-input").value || "", "priority": "medium"}'
+            variant="{{ 'primary' if priority_filter is defined and priority_filter == 'medium' else 'default' }}"
+            aria-label="Filter by medium priority">
+            Medium
+        </sl-button>
+        <sl-button
+            hx-get="/api/todos/search"
+            hx-target="#todos-list"
+            hx-vals='js:{"list_id": "{{ filter_list.id }}", "q": document.querySelector("#search-input").value || "", "priority": "low"}'
+            variant="{{ 'primary' if priority_filter is defined and priority_filter == 'low' else 'default' }}"
+            aria-label="Filter by low priority">
+            Low
+        </sl-button>
+    </sl-button-group>
+</div>

@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import SessionLocal, Todo, TodoList, User, init_db
-from app.routes import auth, pages, todo_lists, todos
+from app.routes import api, auth, pages, todo_lists, todos
 from app.utils import format_date, format_date_input, is_due_today, is_overdue
 
 templates = Jinja2Templates(directory="src/app/templates")
@@ -126,6 +126,7 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
 
 # Include routers
+app.include_router(api.router)
 app.include_router(pages.router)
 app.include_router(auth.router)
 app.include_router(todo_lists.router)

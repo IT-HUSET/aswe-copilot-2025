@@ -190,6 +190,155 @@ class TestTodos:
         assert b"Todo 1" in response.content
         assert b"Todo 2" in response.content
 
+    def test_filter_by_priority_high(self, authenticated_client, test_list, db_session):
+        """Test filtering todos by high priority."""
+        todos = [
+            Todo(list_id=test_list.id, title="High Priority", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Medium Priority", priority="medium", position=1),
+            Todo(list_id=test_list.id, title="Low Priority", priority="low", position=2),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=high"
+        )
+        assert response.status_code == 200
+        assert b"High Priority" in response.content
+        assert b"Medium Priority" not in response.content
+        assert b"Low Priority" not in response.content
+
+    def test_filter_by_priority_medium(self, authenticated_client, test_list, db_session):
+        """Test filtering todos by medium priority."""
+        todos = [
+            Todo(list_id=test_list.id, title="High Priority", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Medium Priority", priority="medium", position=1),
+            Todo(list_id=test_list.id, title="Low Priority", priority="low", position=2),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=medium"
+        )
+        assert response.status_code == 200
+        assert b"High Priority" not in response.content
+        assert b"Medium Priority" in response.content
+        assert b"Low Priority" not in response.content
+
+    def test_filter_by_priority_low(self, authenticated_client, test_list, db_session):
+        """Test filtering todos by low priority."""
+        todos = [
+            Todo(list_id=test_list.id, title="High Priority", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Medium Priority", priority="medium", position=1),
+            Todo(list_id=test_list.id, title="Low Priority", priority="low", position=2),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=low"
+        )
+        assert response.status_code == 200
+        assert b"High Priority" not in response.content
+        assert b"Medium Priority" not in response.content
+        assert b"Low Priority" in response.content
+
+    def test_filter_by_priority_all(self, authenticated_client, test_list, db_session):
+        """Test filtering with 'all' priority returns all todos."""
+        todos = [
+            Todo(list_id=test_list.id, title="High Priority", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Medium Priority", priority="medium", position=1),
+            Todo(list_id=test_list.id, title="Low Priority", priority="low", position=2),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=all"
+        )
+        assert response.status_code == 200
+        assert b"High Priority" in response.content
+        assert b"Medium Priority" in response.content
+        assert b"Low Priority" in response.content
+
+    def test_filter_priority_with_search(self, authenticated_client, test_list, db_session):
+        """Test combining priority filter with text search."""
+        todos = [
+            Todo(list_id=test_list.id, title="Buy groceries", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Buy milk", priority="low", position=1),
+            Todo(list_id=test_list.id, title="Send email", priority="high", position=2),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        # Search for "buy" with high priority
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&q=buy&priority=high"
+        )
+        assert response.status_code == 200
+        assert b"Buy groceries" in response.content
+        assert b"Buy milk" not in response.content  # Wrong priority
+        assert b"Send email" not in response.content  # Doesn't match search
+
+    def test_filter_priority_empty_result(self, authenticated_client, test_list, db_session):
+        """Test priority filter with no matching todos returns empty."""
+        todo = Todo(list_id=test_list.id, title="Low Priority", priority="low", position=0)
+        db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=high"
+        )
+        assert response.status_code == 200
+        assert b"Low Priority" not in response.content
+
+    def test_filter_priority_preserves_ordering(self, authenticated_client, test_list, db_session):
+        """Test priority filter preserves position ordering."""
+        todos = [
+            Todo(list_id=test_list.id, title="High 1", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Low 1", priority="low", position=1),
+            Todo(list_id=test_list.id, title="High 2", priority="high", position=2),
+            Todo(list_id=test_list.id, title="High 3", priority="high", position=3),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=high"
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        # Verify order is preserved by checking positions
+        pos_high1 = content.find("High 1")
+        pos_high2 = content.find("High 2")
+        pos_high3 = content.find("High 3")
+        assert pos_high1 < pos_high2 < pos_high3
+
+    def test_filter_invalid_priority_defaults_to_all(self, authenticated_client, test_list, db_session):
+        """Test invalid priority value defaults to 'all'."""
+        todos = [
+            Todo(list_id=test_list.id, title="High Priority", priority="high", position=0),
+            Todo(list_id=test_list.id, title="Low Priority", priority="low", position=1),
+        ]
+        for todo in todos:
+            db_session.add(todo)
+        db_session.commit()
+
+        # Use invalid priority value
+        response = authenticated_client.get(
+            f"/api/todos/search?list_id={test_list.id}&priority=invalid"
+        )
+        assert response.status_code == 200
+        assert b"High Priority" in response.content
+        assert b"Low Priority" in response.content
+
 
 class TestTodoAccess:
     """Tests for todo access control."""
