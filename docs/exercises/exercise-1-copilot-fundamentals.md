@@ -203,8 +203,9 @@ Switch to **Agent** mode using the dropdown.
 - What information does Copilot need?
 - Should you reference any existing files for context?
 
+<br/>
 <details>
-<summary>Stuck? Try this approach</summary>
+<summary>🤔 <i><b>Stuck?</b> Try this approach</i></summary>
 
 Describe the requirement clearly. Copilot will analyze the codebase and find the right location.
 </details>
