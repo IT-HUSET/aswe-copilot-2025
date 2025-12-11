@@ -102,6 +102,8 @@ async def app_page(
             "lists": lists,
             "active_list": None,
             "todos": [],
+            "search_query": "",
+            "priority_filter": "all",
         },
     )
 
@@ -155,5 +157,7 @@ async def app_list_page(
             "lists": lists,
             "active_list": active_list,
             "todos": todos,
+            "search_query": "",
+            "priority_filter": "all",
         },
     )

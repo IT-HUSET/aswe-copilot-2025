@@ -5,8 +5,14 @@
 {% else %}
 <div class="empty-todos">
     <sl-icon name="inbox" class="empty-icon"></sl-icon>
-    {% if search_query %}
-    <p>No todos match "{{ search_query }}"</p>
+    {% set active_filter = priority_filter|default("all") %}
+    {% set query = search_query|default("") %}
+    {% if query and active_filter != 'all' %}
+    <p>No todos match "{{ query }}" with {{ active_filter }} priority</p>
+    {% elif query %}
+    <p>No todos match "{{ query }}"</p>
+    {% elif active_filter != 'all' %}
+    <p>No {{ active_filter }} priority todos</p>
     {% else %}
     <p>No todos yet. Add your first task above!</p>
     {% endif %}

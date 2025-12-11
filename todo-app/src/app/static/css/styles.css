@@ -360,6 +360,31 @@ body {
     flex: 1;
 }
 
+/* Priority filter */
+.priority-filter {
+    margin: 0 0 16px 0;
+}
+
+.priority-filter sl-button-group {
+    width: 100%;
+    display: flex;
+}
+
+.priority-filter sl-button {
+    flex: 1;
+    transition: all 0.15s ease;
+}
+
+.priority-filter sl-icon {
+    font-size: 14px;
+    margin-right: 4px;
+}
+
+/* Ensure button group buttons are equal width */
+.priority-filter sl-button::part(base) {
+    justify-content: center;
+}
+
 /* Fix button icon sizing */
 sl-button sl-icon[slot="prefix"] {
     font-size: 16px;

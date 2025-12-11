@@ -37,10 +37,48 @@
             hx-trigger="keyup changed delay:300ms, search"
             hx-target="#todos-list"
             hx-swap="innerHTML"
-            hx-vals='{"list_id": "{{ current_list.id }}"}'
-            name="q">
+            hx-vals='js:{list_id: "{{ current_list.id }}", priority: getActivePriority()}'
+            name="q"
+            id="search-input">
             <sl-icon slot="prefix" name="search"></sl-icon>
         </sl-input>
+    </div>
+
+    <!-- Priority Filter -->
+    <div class="priority-filter" id="priority-filter">
+        <sl-button-group label="Filter by priority">
+            <sl-button 
+                size="small" 
+                variant="primary" 
+                data-priority="all"
+                onclick="filterByPriority('all', '{{ current_list.id }}')">
+                All
+            </sl-button>
+            <sl-button 
+                size="small" 
+                variant="neutral" 
+                data-priority="high"
+                onclick="filterByPriority('high', '{{ current_list.id }}')">
+                <sl-icon name="exclamation-circle"></sl-icon>
+                High
+            </sl-button>
+            <sl-button 
+                size="small" 
+                variant="neutral" 
+                data-priority="medium"
+                onclick="filterByPriority('medium', '{{ current_list.id }}')">
+                <sl-icon name="dash-circle"></sl-icon>
+                Medium
+            </sl-button>
+            <sl-button 
+                size="small" 
+                variant="neutral" 
+                data-priority="low"
+                onclick="filterByPriority('low', '{{ current_list.id }}')">
+                <sl-icon name="circle"></sl-icon>
+                Low
+            </sl-button>
+        </sl-button-group>
     </div>
 
     <!-- Quick add todo -->
@@ -48,7 +86,7 @@
           hx-post="/api/todos"
           hx-target="#todos-list"
           hx-swap="beforeend"
-          hx-on::after-request="if(event.detail.successful) this.reset()">
+          hx-on::after-request="if(event.detail.successful) { this.reset(); resetPriorityFilter('{{ current_list.id }}'); }">
         <input type="hidden" name="list_id" value="{{ current_list.id }}">
         <sl-input
             name="title"

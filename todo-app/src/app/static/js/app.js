@@ -29,7 +29,69 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('sl-theme-dark');
         if (icon) icon.name = 'sun';
     }
+    
+    // Handle search clear button
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('sl-clear', () => {
+            const listId = document.querySelector('[data-list-id]')?.dataset.listId;
+            if (listId) {
+                const activeBtn = document.querySelector('#priority-filter sl-button[variant="primary"]');
+                const activePriority = activeBtn?.dataset.priority || 'all';
+                
+                htmx.ajax('GET', '/api/todos/search', {
+                    target: '#todos-list',
+                    swap: 'innerHTML',
+                    values: { 
+                        list_id: listId, 
+                        q: '', 
+                        priority: activePriority === 'all' ? '' : activePriority 
+                    }
+                });
+            }
+        });
+    }
 });
+
+// Priority filter functions
+function getActivePriority() {
+    const activeBtn = document.querySelector('#priority-filter sl-button[variant="primary"]');
+    const priority = activeBtn ? activeBtn.dataset.priority : 'all';
+    return priority === 'all' ? '' : priority;
+}
+
+function filterByPriority(priority, listId) {
+    // Update button states (active = primary, inactive = neutral)
+    const buttons = document.querySelectorAll('#priority-filter sl-button');
+    buttons.forEach(btn => {
+        if (btn.dataset.priority === priority) {
+            btn.setAttribute('variant', 'primary');
+        } else {
+            btn.setAttribute('variant', 'neutral');
+        }
+    });
+
+    // Get current search query
+    const searchInput = document.getElementById('search-input');
+    const searchQuery = searchInput ? searchInput.value : '';
+
+    // Trigger HTMX request with priority filter
+    const priorityParam = priority === 'all' ? '' : priority;
+    htmx.ajax('GET', '/api/todos/search', {
+        target: '#todos-list',
+        swap: 'innerHTML',
+        values: {
+            list_id: listId,
+            q: searchQuery,
+            priority: priorityParam
+        }
+    });
+}
+
+function resetPriorityFilter(listId) {
+    // Reset to "all" after adding new todo
+    filterByPriority('all', listId);
+}
 
 // Initialize SortableJS for list reordering (sidebar)
 function initListSortable() {
@@ -88,6 +150,16 @@ document.body.addEventListener('htmx:afterSwap', (evt) => {
     }
     if (evt.detail.target.id === 'todos-list' || evt.detail.target.id === 'main-content') {
         initTodoSortable();
+        
+        // Reset priority filter to "all" when switching lists (main-content swap)
+        if (evt.detail.target.id === 'main-content') {
+            const priorityButtons = document.querySelectorAll('#priority-filter sl-button');
+            if (priorityButtons.length > 0) {
+                priorityButtons.forEach(btn => {
+                    btn.setAttribute('variant', btn.dataset.priority === 'all' ? 'primary' : 'neutral');
+                });
+            }
+        }
     }
 });
 
