@@ -1,9 +1,10 @@
 """FastAPI Todo Application - Main Entry Point."""
 
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import SQLAlchemyError
@@ -130,6 +131,23 @@ app.include_router(pages.router)
 app.include_router(auth.router)
 app.include_router(todo_lists.router)
 app.include_router(todos.router)
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint."""
+    return JSONResponse({
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+
+
+@app.get("/version")
+async def version():
+    """Version endpoint."""
+    return JSONResponse({
+        "version": app.version
+    })
 
 
 @app.exception_handler(SQLAlchemyError)

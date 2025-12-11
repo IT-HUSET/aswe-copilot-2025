@@ -117,6 +117,7 @@ async def create_todo(
         list_id=list_id,
         title=title.strip(),
         position=new_pos,
+        priority="low",
     )
     db.add(todo)
     db.commit()
@@ -220,12 +221,18 @@ async def update_todo(
     todo.title = title.strip()
     todo.note = note.strip() if note else None
 
-    # Parse due date
+    # Parse due date (accept both date-only and datetime inputs)
     if due_date and due_date.strip():
-        try:
-            todo.due_date = datetime.strptime(due_date, "%Y-%m-%dT%H:%M")
-        except ValueError:
-            pass  # Keep existing
+        parsed = None
+        for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%d"):
+            try:
+                parsed = datetime.strptime(due_date, fmt)
+                break
+            except ValueError:
+                continue
+        if parsed:
+            todo.due_date = parsed
+        # else: keep existing
     else:
         todo.due_date = None
 
