@@ -1,6 +1,8 @@
 """FastAPI Todo Application - Main Entry Point."""
 
+import subprocess
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -130,6 +132,38 @@ app.include_router(pages.router)
 app.include_router(auth.router)
 app.include_router(todo_lists.router)
 app.include_router(todos.router)
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/version")
+async def version():
+    """Return current git commit hash."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=5,
+        )
+        commit_hash = result.stdout.strip()
+        return {
+            "commit": commit_hash,
+            "short_commit": commit_hash[:7],
+        }
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+        return {
+            "commit": "unknown",
+            "short_commit": "unknown",
+        }
 
 
 @app.exception_handler(SQLAlchemyError)

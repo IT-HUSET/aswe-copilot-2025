@@ -19,8 +19,9 @@ def is_due_today(todo: "Todo") -> bool:
     """Return True if due_date == today."""
     if not todo.due_date:
         return False
-    now = datetime.now()
-    return todo.due_date == now
+    today = date.today()
+    due_date = todo.due_date.date() if isinstance(todo.due_date, datetime) else todo.due_date
+    return due_date == today
 
 
 def format_date(dt: datetime | date | None) -> str:
