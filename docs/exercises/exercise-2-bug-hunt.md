@@ -178,49 +178,16 @@ return todo.due_date.date() == today  # for is_due_today
 
 ## Final Check
 
-Open a new terminal and run all tests:
+As the agent to run all tests and confirm everything passes.
+
+Alternatively, you can run the tests yourself, using the command below in a new terminal:
 ```bash
 cd todo-app
 uv run pytest tests/ -v
 ```
 
-All tests _but one_ should pass, i.e. you should get a test failure like this:
-```bash
-tests/test_todos.py:29: AssertionError
-=============== short test summary info ================
-FAILED tests/test_todos.py::TestTodos::test_create_todo - AssertionError: assert None == 'low'
-```
+All tests should pass.
 
----
-
-## Part B: Write a Test (Optional)
-
-Now that all bugs are fixed, practice writing tests with Copilot.
-
-### Task: Add a Test for Default Priority
-
-**Goal:** Write a test that verifies new todos get `priority="low"` by default, and fix any existing tests that fail because of this new behavior.
-
-**Your task:** Ask Copilot to create a new test and fix existing tests. Consider:
-- Where do existing tests live? (`todo-app/tests/`)
-- What pattern do existing tests follow?
-- Use `/tests` slash command or describe what you need?
-
-<br/>
-
-<details>
-<summary>🤔 <i><b>Stuck?</b> Try this prompt</i></summary>
-
-> ```md
-> @workspace Add a test that verifies new todos created without explicit priority get "low" as the default. 
-> Also fix any existing tests that fail because of this new behavior.
-> Follow the existing test patterns in tests/test_todos.py.
-> ```
-</details>
-
-<br/>
-
-**Verify:** Run `uv run pytest tests/test_todos.py -v` — your new test should pass.
 
 ---
 
