@@ -11,16 +11,18 @@ def is_overdue(todo: "Todo") -> bool:
     """Return True if due_date < today AND not completed."""
     if todo.is_completed or not todo.due_date:
         return False
-    now = datetime.now()
-    return todo.due_date < now
+    today = datetime.now(timezone.utc).date()
+    due = todo.due_date.date() if isinstance(todo.due_date, datetime) else todo.due_date
+    return due < today
 
 
 def is_due_today(todo: "Todo") -> bool:
     """Return True if due_date == today."""
     if not todo.due_date:
         return False
-    now = datetime.now()
-    return todo.due_date == now
+    today = datetime.now(timezone.utc).date()
+    due = todo.due_date.date() if isinstance(todo.due_date, datetime) else todo.due_date
+    return due == today
 
 
 def format_date(dt: datetime | date | None) -> str:
@@ -39,3 +41,8 @@ def format_date_input(dt: datetime | date | None) -> str:
     if isinstance(dt, datetime):
         dt = dt.date()
     return dt.strftime("%Y-%m-%d")
+
+
+def utc_now() -> datetime:
+    """Return current UTC datetime."""
+    return datetime.now(timezone.utc)
